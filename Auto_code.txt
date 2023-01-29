@@ -1,0 +1,56 @@
+/// <reference types="cypress" />
+
+//mocha
+describe("Product Sweep Login Test Suite (Login)", () => {
+    const username = "liliangao21@gmail.com"
+    const password = "password"
+    beforeEach(() => {
+        cy.visit("/")
+    })
+
+    it("C1 Negative login", { tags: ["login"] }, () => {
+        cy.get("input.Input_input__cPTrT[type='text']").type(username).should("have.value", username)
+        cy.get("input.Input_input__cPTrT[type='password']")
+            .type(password, { log: false })
+            .should("have.value", password)
+        cy.get("button[type='submit']").click()
+        cy.get("input.Input_input__cPTrT[type='text']").should("have.value", username)
+        cy.get("input.Input_input__cPTrT[type='password']").should("have.value", "")
+        cy.contains("Username not found").should("be.visible")
+    })
+
+    it("C2 Forgot your password", { tags: ["login"] }, () => {
+        cy.contains("Forgot your password?").click()
+        cy.url().should("eq", "https://demo.combyne.ag/login/forget-password")
+        cy.get("input.Input_input__cPTrT[type='text']").type(username).should("have.value", username)
+        cy.get("button[type='submit']").click()
+        cy.contains("Whoops! That email is not associated with an account.", { timeout: 15 * 1000 }).should(
+            "be.visible"
+        )
+    })
+
+    it("C3 Back to Login", { tags: ["login"] }, () => {
+        cy.visit("forget-password")
+        cy.contains("Back to Login").click()
+        cy.url().should("eq", "https://demo.combyne.ag/login")
+        cy.contains("Welcome to Combyne", { timeout: 15 * 1000 }).should("be.visible")
+    })
+
+    it("C4 Contact Us", { tags: ["login"] }, () => {
+        cy.contains("Contact Us").should("have.attr", "href", "mailto:help@combyne.ag")
+    })
+    it("C5 Create an Account", { tags: ["login"] }, () => {
+        cy.contains("Create an Account").click()
+        cy.url().should("eq", "https://demo.combyne.ag/onboard/details")
+        cy.contains("Create your Combyne account to get started.", { timeout: 10 * 1000 }).should("be.visible")
+    })
+    it("C6 Terms of us and Privacy policy", { tags: ["login"] }, () => {
+        cy.visit("https://demo.combyne.ag/onboard/details")
+        cy.contains("Terms of us").should("have.attr", "href", "/terms-of-use")
+        cy.contains("Privacy policy").should("have.attr", "href", "/privacy-policy")
+    })
+
+    it("C7 Negative test", { tags: ["login"] }, () => {
+        cy.get("[data-auto-id='fake_locator']").should("be.visible")
+    })
+})
